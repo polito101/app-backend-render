@@ -1,6 +1,6 @@
 const e = require('express');
 
-const admin = require('./../index').firebaseAdmin;
+const { firebaseAdmin } = require('../config/clients');
 
 const verifyToken = async (req, res, next) => {
     try {
@@ -10,7 +10,7 @@ const verifyToken = async (req, res, next) => {
         }
 
         const idToken = token.split('Bearer ')[1];
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
         req.user = decodedToken;
         next();
     } catch (error) {

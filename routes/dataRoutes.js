@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/auth');
-const redisClient = require('./../index').redisClient;
+const { redisClient } = require('../config/clients');
 
 // Ruta protegida para obtener datos
 router.post('/data', verifyToken, async (req, res) => {
