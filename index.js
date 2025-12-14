@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const admin = require('firebase-admin');
 const cors = require('cors');
-const { createClient } = redis;
+const { createClient } = require('redis');
 const dataRoutes = require('./routes/dataRoutes');
 
 const PORT = process.env.PORT || 3000;
