@@ -20,8 +20,4 @@ redisConnectPromise.then(() => {
   app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
   });
-}.catch ((error) => {
-  console.error('No se pudo iniciar el servidor debido a un error de conexión a Redis:', err);
-  console.error(message);
-  process.exit(1);
-} ));
+}
