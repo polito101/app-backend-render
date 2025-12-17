@@ -3,11 +3,11 @@ const cors = require('cors');
 require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
-
+const { joinGame } = require('./controllers/gameController');
 
 const dataRoutes = require('./routes/dataRoutes');
 // 💡 Importamos la configuración para inicializar las promesas de conexión
-const { redisConnectPromise } = require('./config/clients');
+const { redisConnectPromise, redisClient } = require('./config/clients');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -29,6 +29,14 @@ const io = new Server(server, {
 //socket == usuario
 io.on('connection', (socket) => {
   console.log('✅✅Nuevo usuario conectado con ID:', socket.id);
+
+  socket.on('joinGame', () => {
+    joinGame(io, socket, redisClient);
+  });
+
+  socket.on('start_game', () => {
+        startGame(io, socket, redisClient);
+    });
 
   socket.on('disconnect', () => {
     console.log('Adiós, usuario desconectado id:', socket.id);

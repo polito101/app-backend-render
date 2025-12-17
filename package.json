@@ -11,7 +11,8 @@
     "express",
     "firebase",
     "redis",
-    "socket.io"
+    "socket.io",
+    "uuid"
   ],
   "author": "",
   "license": "ISC",
@@ -22,6 +23,7 @@
     "express": "^5.2.1",
     "firebase-admin": "^13.6.0",
     "redis": "^5.10.0",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "uuid": "^13.0.0"
   }
 }
