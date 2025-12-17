@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid');
  * @param {Object} redisClient - El cliente de Redis conectado
  */
 
-const joinGame = async (io, Socket, redisCliente) => {
+const joinGame = async (io, socket, redisClient) => {
     const userId = socket.uid;
 
     if (!userId) {
@@ -23,9 +23,9 @@ const joinGame = async (io, Socket, redisCliente) => {
         let roomId = null;
 
         // Buscar una sala con espacio disponible
-        const keys = await redisCliente.keys('room:*');
+        const keys = await redisClient.keys('room:*');
         for (const key of keys) {
-            const roomData = await redisCliente.hGetAll(key);
+            const roomData = await redisClient.hGetAll(key);
             const players = JSON.parse(roomData.players || '[]');
 
             if (roomData.status === 'waiting' && players.length < 5) {
@@ -51,12 +51,12 @@ const joinGame = async (io, Socket, redisCliente) => {
                 turn: '0',
                 createdAt: Date.now().toString(),
             };
-            await redisCliente.hSet('room:${roomId}', newRoom);
+            await redisClient.hSet('room:${roomId}', newRoom);
         }
 
         // Unir al usuario a la sala
         const roomKey = `room:${roomId}`;
-        const currentRoomData = await redisCliente.hGetAll(roomKey);
+        const currentRoomData = await redisClient.hGetAll(roomKey);
         let currentPlayers = JSON.parse(currentRoomData.players || '[]');
 
         // Verificar si el usuario ya está en la sala
