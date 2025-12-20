@@ -4,7 +4,8 @@ require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
 
-const { joinGame, startGame } = require('./controllers/gameController');
+const { joinGame } = require('./controllers/gameController');
+const startGame = require('./controllers/startGame');
 
 const dataRoutes = require('./routes/dataRoutes');
 const { redisConnectPromise, redisClient } = require('./config/clients');
