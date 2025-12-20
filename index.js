@@ -4,7 +4,6 @@ require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
 
-// 1. CORRECCIÓN: Importar también startGame
 const { joinGame, startGame } = require('./controllers/gameController');
 
 const dataRoutes = require('./routes/dataRoutes');
@@ -41,7 +40,6 @@ io.on('connection', (socket) => {
   
   console.log('✅✅ Nuevo usuario conectado:', socket.id, 'UID:', socket.uid);
 
-  // 2. CORRECCIÓN: Usar 'join_game' para coincidir con Flutter
   socket.on('join_game', () => {
     joinGame(io, socket, redisClient);
   });
@@ -58,7 +56,6 @@ io.on('connection', (socket) => {
 // Esperamos a Redis y arrancamos el servidor
 redisConnectPromise.then(() => {
   
-  // 3. CORRECCIÓN CRÍTICA: Usar server.listen, NO app.listen
   server.listen(PORT, () => {
     console.log(`🚀 Servidor HTTP y Socket.IO corriendo en puerto: ${PORT}`);
   });

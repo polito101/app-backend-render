@@ -17,7 +17,7 @@ const joinGame = async (io, socket, redisClient) => {
         return;
     }
 
-    console.log('Usuario ${userId} buscando mesa...');
+    console.log(`Usuario ${userId} buscando mesa...`);
 
     try {
         let roomId = null;
@@ -30,7 +30,7 @@ const joinGame = async (io, socket, redisClient) => {
 
             if (roomData.status === 'waiting' && players.length < 5) {
                 roomId = roomData.id;
-                console.log('Mesa encontrada: ${roomId} para el usuario ${userId}');
+                console.log(`Mesa encontrada: ${roomId} para el usuario ${userId}`);
                 break;
             }
         }
@@ -40,7 +40,7 @@ const joinGame = async (io, socket, redisClient) => {
             const uniqueRoomId = uuidv4();
             roomId = `room:${uniqueRoomId}`;
 
-            console.log('Creando nueva mesa: ${roomId}');
+            console.log(`Creando nueva mesa: ${roomId}`);
             const newRoom = {
                 id: roomId,
                 status: 'WAITING',
@@ -74,7 +74,7 @@ const joinGame = async (io, socket, redisClient) => {
             };
             currentPlayers.push(newPlayer);
             await redisClient.hSet(roomKey, 'players', JSON.stringify(currentPlayers));
-            console.log('Usuario ${userId} se unió a la mesa ${roomId}');
+            console.log(`Usuario ${userId} se unió a la mesa ${roomId}.`);
         }
 
         socket.join(roomId);
@@ -91,7 +91,7 @@ const joinGame = async (io, socket, redisClient) => {
             players: currentPlayers
         });
 
-        console.log('Usuario ${userId} unido a la sala ${roomId} exitosamente. Total jugadores: ${currentPlayers.length}');
+        console.log(`Usuario ${userId} unido a la sala ${roomId} exitosamente. Total jugadores: ${currentPlayers.length}`);
     } catch (error) {
         console.error('ERROR en joinGame:', error);
         socket.emit('error', { message: 'Error al unirse al juego.' });

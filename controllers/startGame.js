@@ -50,13 +50,9 @@ const startGame = async (io, socket, redisClient) => {
             'turn': '0'
         });
      
-        // OPCIÓN A (Simple): Mandar todo a todos (Inseguro para póker real, bueno para debug)
-        // io.to(roomId).emit('game_started', { players });
-
-        // OPCIÓN B (Segura): Cada jugador solo recibe SUS cartas
+        // Cada jugador solo recibe SUS cartas
         // Recorremos los jugadores y enviamos mensaje individual a su socketId
         players.forEach(p => {
-            // A este socket específico le mandamos SU mano
             io.to(p.socketId).emit('deal_cards', {
                 myHand: p.hand,
                 players: players.map(pl => ({...pl, hand: null})) // Ocultamos cartas ajenas

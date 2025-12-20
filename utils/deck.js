@@ -1,6 +1,6 @@
 const SUITS = ['H', 'D', 'C', 'S']; // Hearts, Diamonds, Clubs, Spades
 const RANKS = [
-    '7', '8', '9', '10',
+    '8', '9', '10',
     'J', 'Q', 'K', 'A'
 ];
 
