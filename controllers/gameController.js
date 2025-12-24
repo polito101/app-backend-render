@@ -53,6 +53,7 @@ const joinGame = async (io, socket, redisClient) => {
             players: players 
         });
 
+        console.log(`✅ Usuario ${userId} se unió a la sala ${roomId}`);
     } catch (error) {
         console.error('Error en joinGame:', error);
     }
