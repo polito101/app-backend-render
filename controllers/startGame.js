@@ -1,4 +1,3 @@
-// controllers/startGame.js
 const { createDeck, shuffleDeck, drawCard } = require('../utils/deck');
 
 const startGame = async (io, socket, redisClient) => {
@@ -7,41 +6,47 @@ const startGame = async (io, socket, redisClient) => {
 
     try {
         const roomKey = roomId;
-        console.log(`🎰 Iniciando partida en ${roomId}`);
-        
         let deck = createDeck();
         deck = shuffleDeck(deck);
 
         const roomData = await redisClient.hGetAll(roomKey);
         let players = JSON.parse(roomData.players || '[]');
 
-        // Repartir 2 cartas a cada uno
+        // 1. Repartir cartas
         players = players.map(p => {
             p.hand = [drawCard(deck), drawCard(deck)];
+            p.status = 'ACTIVE'; // Aseguramos que estén activos
             return p;
         });
 
-        // Guardar estado en Redis
+        // 2. Establecer Turno Inicial (Si no existe, empieza el asiento 0)
+        let currentTurn = parseInt(roomData.turn);
+        if (isNaN(currentTurn)) currentTurn = 0;
+
+        // 3. Guardar en Redis
         await redisClient.hSet(roomKey, {
             deck: JSON.stringify(deck),
             players: JSON.stringify(players),
-            status: 'PLAYING'
+            status: 'PLAYING',
+            turn: currentTurn.toString()
         });
 
-        // Notificar inicio (público)
+        // 4. Notificar a todos (INCLUYENDO EL TURNO)
         io.to(roomId).emit('game_started', { 
             status: 'PLAYING',
-            players: players.map(p => ({...p, hand: null})) 
+            players: players.map(p => ({ ...p, hand: null })),
+            turn: currentTurn // ✅ IMPORTANTE: Enviamos el turno al Frontend
         });
 
-        // Enviar cartas privadas
+        // 5. Enviar cartas privadas
         for (const p of players) {
             io.to(p.socketId).emit('your_cards', { cards: p.hand });
         }
+        
+        console.log(`🃏 Partida iniciada en ${roomId}. Turno: ${currentTurn}`);
 
-        console.log(`✅ Cartas repartidas y partida iniciada en ${roomId}`);
-    } catch (e) {
-        console.error("Error en startGame:", e);
+    } catch (error) {
+        console.error('Error en startGame:', error);
     }
 };
 
