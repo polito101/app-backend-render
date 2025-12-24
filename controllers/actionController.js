@@ -9,7 +9,7 @@ const handleAction = async (io, socket, redisClient, actionData) => {
         const roomKey = roomId;
         const roomData = await redisClient.hGetAll(roomKey);
         let players = JSON.parse(roomData.players || '[]');
-        
+
         // Identificar al jugador actual
         const playerIndex = players.findIndex(p => p.uid === userId);
         const player = players[playerIndex];
@@ -19,10 +19,10 @@ const handleAction = async (io, socket, redisClient, actionData) => {
         // VALIDACIÓN: ¿Es su turno?
         // El turno en Redis lo guardamos como un número (índice del array)
         const currentTurnIndex = parseInt(roomData.turn);
-        
+
         // Comprobación de seguridad: ¿Está intentando jugar fuera de turno?
         if (player.seat !== currentTurnIndex && playerIndex !== currentTurnIndex) {
-             return socket.emit('error', { message: '¡No es tu turno!' });
+            return socket.emit('error', { message: '¡No es tu turno!' });
         }
 
         console.log(`🕹️ Acción de ${userId}: ${action} (${amount || 0})`);
@@ -37,7 +37,7 @@ const handleAction = async (io, socket, redisClient, actionData) => {
             case 'check':
                 // En póker real, solo puedes hacer check si no hay apuestas pendientes.
                 // Por ahora lo permitimos siempre para simplificar.
-                player.status = 'CHECK'; 
+                player.status = 'CHECK';
                 break;
 
             case 'call':
@@ -55,12 +55,12 @@ const handleAction = async (io, socket, redisClient, actionData) => {
                 }
                 player.chips -= betAmount;
                 player.bet = (player.bet || 0) + betAmount; // Acumular apuesta de la ronda
-                
+
                 // Actualizar Bote Global
                 let currentPot = parseInt(roomData.pot || 0);
                 currentPot += betAmount;
                 roomData.pot = currentPot.toString();
-                
+
                 player.status = 'BET';
                 break;
         }
@@ -69,12 +69,12 @@ const handleAction = async (io, socket, redisClient, actionData) => {
         // Buscamos el siguiente asiento que NO esté 'FOLDED' ni 'BUSTED' (eliminado)
         let nextTurnIndex = currentTurnIndex;
         let loopCount = 0;
-        
+
         do {
             nextTurnIndex = (nextTurnIndex + 1) % players.length;
             loopCount++;
         } while (
-            (players[nextTurnIndex].status === 'FOLDED' || players[nextTurnIndex].status === 'BUSTED') 
+            (players[nextTurnIndex].status === 'FOLDED' || players[nextTurnIndex].status === 'BUSTED')
             && loopCount < players.length
         );
 
@@ -99,7 +99,7 @@ const handleAction = async (io, socket, redisClient, actionData) => {
         });
 
         // Solo al jugador que actuó le enviamos sus datos actualizados (fichas)
-        socket.emit('player_update', { chips: player.chips });
+        socket.emit('player_update', { chips: player.chips, seat: player.seat });
 
     } catch (error) {
         console.error('Error en handleAction:', error);
