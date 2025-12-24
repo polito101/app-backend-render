@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 
 const { joinGame } = require('./controllers/gameController');
 const startGame = require('./controllers/startGame');
+const handleAction = require('./controllers/actionController');
 
 const dataRoutes = require('./routes/dataRoutes');
 const { redisConnectPromise, redisClient } = require('./config/clients');
@@ -30,14 +31,14 @@ const io = new Server(server, {
   cors: {
     // 💡 CONSEJO: Para probar desde Flutter/Móvil, usa "*" temporalmente.
     // Los móviles no siempre envían el origen 'firebaseapp'.
-    origin: "*", 
+    origin: "*",
     methods: ['GET', 'POST'],
   },
 });
 
 io.on('connection', (socket) => {
   socket.uid = socket.handshake.auth.token || 'anonimo';
-  
+
   console.log('✅✅ Nuevo usuario conectado:', socket.id, 'UID:', socket.uid);
 
   socket.on('join_game', () => {
@@ -49,6 +50,10 @@ io.on('connection', (socket) => {
     startGame(io, socket, redisClient);
   });
 
+  socket.on('player_action', (data) => {
+    handleAction(io, socket, redisClient, data);
+  });
+
   socket.on('disconnect', () => {
     console.log('Adiós, usuario desconectado id:', socket.id);
   });
@@ -56,13 +61,13 @@ io.on('connection', (socket) => {
 
 // Esperamos a Redis y arrancamos el servidor
 redisConnectPromise.then(() => {
-  
+
   server.listen(PORT, () => {
     console.log(`🚀 Servidor HTTP y Socket.IO corriendo en puerto: ${PORT}`);
   });
 
 }).catch(err => {
-    console.error("Fallo al conectar a Redis:", err);
+  console.error("Fallo al conectar a Redis:", err);
 });
 
 module.exports = { io };

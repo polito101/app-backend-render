@@ -50,12 +50,13 @@ const joinGame = async (io, socket, redisClient) => {
 
         io.to(roomId).emit('joined_room', { 
             roomId: roomId,
+            playerId: userId,
             players: players 
         });
 
         console.log(`✅ Usuario ${userId} se unió a la sala ${roomId}`);
     } catch (error) {
-        console.error('Error en joinGame:', error);
+        console.error('Error en joined_room:', error);
     }
 };
 
