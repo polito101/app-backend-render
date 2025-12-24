@@ -6,13 +6,13 @@ const startGame = async (io, socket, redisClient) => {
     if (!roomId) return;
 
     try {
-        const roomKey = `room:${roomId}`; // ✅ Uso de backticks
+        const roomKey = roomId;
         console.log(`🎰 Iniciando partida en ${roomId}`);
         
         let deck = createDeck();
         deck = shuffleDeck(deck);
 
-        let roomData = await redisClient.hGetAll(roomKey);
+        const roomData = await redisClient.hGetAll(roomKey);
         let players = JSON.parse(roomData.players || '[]');
 
         // Repartir 2 cartas a cada uno
@@ -30,6 +30,7 @@ const startGame = async (io, socket, redisClient) => {
 
         // Notificar inicio (público)
         io.to(roomId).emit('game_started', { 
+            status: 'PLAYING',
             players: players.map(p => ({...p, hand: null})) 
         });
 
@@ -37,9 +38,11 @@ const startGame = async (io, socket, redisClient) => {
         for (const p of players) {
             io.to(p.socketId).emit('your_cards', { cards: p.hand });
         }
+
+        console.log(`✅ Cartas repartidas y partida iniciada en ${roomId}`);
     } catch (e) {
         console.error("Error en startGame:", e);
     }
 };
 
-module.exports = startGame; // Exportación directa
+module.exports = startGame;
