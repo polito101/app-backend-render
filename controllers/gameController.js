@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const joinGame = async (io, socket, redisClient) => {
     const userId = socket.uid;
     if (!userId) return;
+    console.log('V2 Usuario', userId, 'está intentando unirse a un juego.');
 
     try {
         let roomId = null;
@@ -21,7 +22,7 @@ const joinGame = async (io, socket, redisClient) => {
         if (!roomId) {
             const id = uuidv4();
             roomId = `room:${id}`;
-            await redisClient.hSet(roomId, { // ✅ Clave corregida
+            await redisClient.hSet(roomId, {
                 id: roomId,
                 status: 'WAITING',
                 players: '[]',
@@ -47,7 +48,6 @@ const joinGame = async (io, socket, redisClient) => {
         socket.join(roomId);
         socket.activeRoomId = roomId;
 
-        // ✅ IMPORTANTE: El evento debe ser 'joined_room' como en Flutter
         io.to(roomId).emit('joined_room', { 
             roomId: roomId,
             players: players 

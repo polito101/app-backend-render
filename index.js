@@ -36,12 +36,12 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  // Aseguramos que el UID esté disponible (si usaste el middleware, si no, manéjalo aquí)
   socket.uid = socket.handshake.auth.token || 'anonimo';
   
   console.log('✅✅ Nuevo usuario conectado:', socket.id, 'UID:', socket.uid);
 
   socket.on('join_game', () => {
+    console.log('Usuario', socket.uid, 'quiere unirse a un juego.');
     joinGame(io, socket, redisClient);
   });
 
