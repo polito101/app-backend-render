@@ -37,8 +37,8 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  socket.uid = socket.handshake.auth.token || 'anonimo';
-
+  const auth = socket.handshake.auth;
+socket.uid = auth.uid || auth.token || 'anonimo';
   console.log('✅✅ Nuevo usuario conectado:', socket.id, 'UID:', socket.uid);
 
   socket.on('join_game', () => {
