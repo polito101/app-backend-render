@@ -18,11 +18,8 @@ const startGame = async (io, socket, redisClient) => {
             p.status = 'ACTIVE'; // Aseguramos que estén activos
             return p;
         });
-
-        // 2. Establecer Turno Inicial (Si no existe, empieza el asiento 0)
-        let currentTurn = parseInt(roomData.turn);
-        if (isNaN(currentTurn)) currentTurn = 0;
-
+        const dealer = players.find(p => p.socketId === socket.id);
+        let currentTurn = dealer ? dealer.seat: 0;
         // 3. Guardar en Redis
         await redisClient.hSet(roomKey, {
             deck: JSON.stringify(deck),
