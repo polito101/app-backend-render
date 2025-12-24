@@ -32,7 +32,7 @@ const startGame = async (io, socket, redisClient) => {
         io.to(roomId).emit('game_started', { 
             status: 'PLAYING',
             players: players.map(p => ({ ...p, hand: null })),
-            turn: currentTurn // ✅ IMPORTANTE: Enviamos el turno al Frontend
+            turn: parseInt(currentTurn) // ✅ IMPORTANTE: Enviamos el turno al Frontend
         });
 
         // 5. Enviar cartas privadas
